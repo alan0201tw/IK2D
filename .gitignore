@@ -1,0 +1,34 @@
+# folders
+.vscode/*
+.vs/*
+bin/*
+bin-int/*
+
+# executables
+main
+*.exe
+
+# output files
+output/*
+*.mp4
+
+# Visual studio solution/project files
+*.sln
+*.vcxproj*
+
+# shared objects and cache for testing
+*.so
+*cache*
+tests/bin/*
+tests/test
+tests/*.png
+
+# python_binding
+python_binding/bin/*
+
+# allow exported file collections
+!/exports/*.mp4
+
+# ignore premake generated gmake files
+Makefile
+*.make
