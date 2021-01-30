@@ -13,17 +13,20 @@ static GLFWwindow* window;
 static GLuint program;
 static GLuint vertex_array, vertex_buffer, index_buffer;
 
-GLint P_location = 0;
-GLint M_location = 0;
+static GLint P_location = 0;
+static GLint M_location = 0;
+static GLint Color_location = 0;
+
+static float b2d_color[3] = {0.8f, 0.3f, 0.2f};
 
 static double previousTime = 0.0f;
 
 static float vertices[4 * 3] =
 {
-     0.0f,  0.0f, 0.0f,
-     1.0f,  0.0f, 0.0f,
-     1.0f,  1.0f, 0.0f,
-     0.0f,  1.0f, 0.0f
+     0.0f, -0.5f, 0.0f,
+     1.0f, -0.5f, 0.0f,
+     1.0f,  0.5f, 0.0f,
+     0.0f,  0.5f, 0.0f
 };
 
 static const char* vertex_shader_text = 
@@ -46,16 +49,15 @@ static const char* vertex_shader_text =
 static const char* fragment_shader_text = 
     "#version 330 core\n"
 "\n"
-    "precision highp float;\n"
-"\n"
     "layout(location = 0) out vec4 color;\n"
+"\n"
+	"uniform vec3 u_Color;"
 "\n"
     "in vec3 v_Position;\n"
 "\n"
     "void main()\n"
     "{\n"
-    "    color = vec4(0.8f, 0.2f, 0.3f, 1.0f);\n"
-    "    // color = vec4(0.0f, 0.0f, 0.5f, 1.0f);\n"
+    "    color = vec4(u_Color, 1.0f);\n"
     "}\n"
 ;
 
@@ -162,11 +164,17 @@ void renderer2D_init()
 
 	P_location = glGetUniformLocation(program, "P");
 	M_location = glGetUniformLocation(program, "M");
+	Color_location = glGetUniformLocation(program, "u_Color");
 }
 
 bool renderer2D_should_close()
 {
 	return glfwWindowShouldClose(window);
+}
+
+GLFWwindow* renderer2D_window()
+{
+	return window;
 }
 
 double renderer2D_start_frame()
@@ -214,39 +222,75 @@ void renderer2D_clean_up()
 // } __internal_hack_mat4x4;
 
 static mat4x4 accumulatingMatrix;
-static float accumulatingAngle;
-static void __internal_b2d_render(bone2D b2d)
+static bone2D* end_bone;
+static void __internal_b2d_render(bone2D* b2d)
 {
 	// render parent bone first, which will multiply the accumulatingMatrix
 	// with the parent's transformation matrix;
-	if(b2d.parent != NULL)
-		__internal_b2d_render(*(b2d.parent));
+	if(b2d->parent != NULL)
+		__internal_b2d_render(b2d->parent);
 
-	mat4x4 modelMatrix;
-	mat4x4_identity(modelMatrix);
-	mat4x4_translate(modelMatrix, b2d.x, b2d.y, 0.0f);
-	mat4x4_rotate_Z(modelMatrix, modelMatrix, b2d.angle);
-	mat4x4 scaledMatrix;
-	mat4x4_dup(scaledMatrix, modelMatrix);
-	mat4x4_scale_aniso(scaledMatrix, modelMatrix, b2d.length, 0.02f, 1.0f);
-	mat4x4_mul(scaledMatrix, accumulatingMatrix, scaledMatrix);
-	glUniformMatrix4fv(M_location, 1, GL_FALSE, (const GLfloat*)scaledMatrix);
+	if(b2d->parent != NULL)
+	{
+		mat4x4 modelMatrix;
+		mat4x4_identity(modelMatrix);
+		// mat4x4_rotate_Z(modelMatrix, modelMatrix, b2d->angle);
+		mat4x4_scale_aniso(modelMatrix, modelMatrix, b2d->length, 0.02f, 1.0f);
+		mat4x4_mul(modelMatrix, accumulatingMatrix, modelMatrix);
+		glUniformMatrix4fv(M_location, 1, GL_FALSE, (const GLfloat*)modelMatrix);
+		glUniform3f(Color_location, b2d_color[0], b2d_color[1], b2d_color[2]);
+		glDrawArrays(GL_QUADS, 0, 4);
+		glBindVertexArray(vertex_array);
+	}
 
 	// the length of each bone is b2d.length
-	mat4x4_mul(modelMatrix, accumulatingMatrix, modelMatrix);
-	accumulatingAngle += b2d.angle;
-	mat4x4_translate(modelMatrix, 
-		b2d.length * cosf(accumulatingAngle), b2d.length * (sinf(accumulatingAngle)), 0.0f);
-	mat4x4_dup(accumulatingMatrix, modelMatrix);
+	mat4x4 localAccumulatingMatrix;
+	mat4x4_identity(localAccumulatingMatrix);
+	// root bone should not have length, or should have zero length
+	// in this case we just ignore it by leaving it out of 
+	// the matrix multiplication chain
+	if(b2d->parent != NULL)
+		mat4x4_translate(localAccumulatingMatrix, b2d->length, 0.0f, 0.0f);
+	mat4x4_rotate_Z(localAccumulatingMatrix, localAccumulatingMatrix, b2d->angle);
+	mat4x4_mul(accumulatingMatrix, accumulatingMatrix, localAccumulatingMatrix);
+}
 
-    glBindVertexArray(vertex_array);
+void b2d_render(bone2D* b2d)
+{
+	mat4x4_identity(accumulatingMatrix);
+	end_bone = b2d;
+
+	__internal_b2d_render(b2d);
+}
+
+void t2d_render(target2D* t2d)
+{
+	mat4x4 modelMatrix;
+	mat4x4_identity(modelMatrix);
+	mat4x4_translate(modelMatrix, t2d->x, t2d->y, 0.0f);
+	mat4x4_scale(modelMatrix, modelMatrix, 0.05f);
+	// mat4x4_scale_aniso(modelMatrix, modelMatrix, 0.05f, 0.05f, 0.05f);
+
+	glUniform3f(Color_location, 0.2f, 0.8f, 0.3f);
+
+	glUniformMatrix4fv(M_location, 1, GL_FALSE, (const GLfloat*)modelMatrix);
+
+	glBindVertexArray(vertex_array);
     glDrawArrays(GL_QUADS, 0, 4);
 }
 
-void b2d_render(bone2D b2d)
+void render2D_render_point(float x, float y)
 {
-	mat4x4_identity(accumulatingMatrix);
-	accumulatingAngle = 0.0f;
+	mat4x4 modelMatrix;
+	mat4x4_identity(modelMatrix);
+	mat4x4_translate(modelMatrix, x, y, 0.0f);
+	mat4x4_scale(modelMatrix, modelMatrix, 0.02f);
+	// mat4x4_scale_aniso(modelMatrix, modelMatrix, 0.05f, 0.05f, 0.05f);
 
-	__internal_b2d_render(b2d);
+	glUniform3f(Color_location, 1.0f, 1.0f, 1.0f);
+
+	glUniformMatrix4fv(M_location, 1, GL_FALSE, (const GLfloat*)modelMatrix);
+
+	glBindVertexArray(vertex_array);
+    glDrawArrays(GL_QUADS, 0, 4);
 }
