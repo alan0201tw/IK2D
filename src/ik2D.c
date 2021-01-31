@@ -80,13 +80,13 @@ ik_status_code ik_ccd_single_iteration(bone2D* b2d, target2D t2d)
             = world_bone_data[boneIdx - 1];
         bone2D* current_bone = b2d_list[boneIdx];
  
-        world_bone_data[boneIdx].x = 
-            previous_world_bone.x + previous_world_bone.cos_value * current_bone->length;
-        world_bone_data[boneIdx].y = 
-            previous_world_bone.y + previous_world_bone.sin_value * current_bone->length;
         world_bone_data[boneIdx].angle = previous_world_bone.angle + current_bone->angle;
         world_bone_data[boneIdx].cos_value = cosf( world_bone_data[boneIdx].angle );
         world_bone_data[boneIdx].sin_value = sinf( world_bone_data[boneIdx].angle );
+        world_bone_data[boneIdx].x = 
+            previous_world_bone.x + world_bone_data[boneIdx].cos_value * current_bone->length;
+        world_bone_data[boneIdx].y = 
+            previous_world_bone.y + world_bone_data[boneIdx].sin_value * current_bone->length;
 
         render2D_render_point(world_bone_data[boneIdx].x, world_bone_data[boneIdx].y);
     }
@@ -135,7 +135,8 @@ ik_status_code ik_ccd_single_iteration(bone2D* b2d, target2D t2d)
         end_effector_position[1] = world_bone_data[boneIdx].y + sinRotAng*curToEndX + cosRotAng*curToEndY;
 
         // Rotate the current bone in local space (this value is output to the user)
-        b2d_list[boneIdx]->angle += rotAng;
+        b2d_list[boneIdx+1]->angle += rotAng;
+        // fprintf(stderr, "idx = %d : add ang = %f \n", boneIdx, rotAng);
 
         // Check for termination
         float endToTargetX = (t2d.x - end_effector_position[0]);

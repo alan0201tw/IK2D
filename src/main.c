@@ -13,18 +13,29 @@ int main(int argc, char** argv)
 {
     renderer2D_init();
 
-    bone2D tmp[15];
-    for(int i = 0; i < 15; i++)
+    bone2D tmp[5];
+    for(int i = 0; i < 5; i++)
     {
         tmp[i].angle = 0.0f;
         // tmp[i].angle = (6.28f / 15.0f);
         // tmp[i].length = 0.2f;
-        // tmp[i].length = 0.05f * (5-i);
-        tmp[i].length = 0.02f * (i+1);
-        if(i < 14)
+        tmp[i].length = 0.05f * (5-i);
+        // tmp[i].length = 0.02f * (i+1);
+        if(i < 4)
             tmp[i].parent = &(tmp[i+1]);
         else
             tmp[i].parent = NULL;
+    }
+
+    bone2D tmp1[5];
+    for(int i = 0; i < 5; i++)
+    {
+        tmp1[i].angle = (6.28f / 10.0f);
+        tmp1[i].length = 0.05f * (i+1);
+        if(i < 4)
+            tmp1[i].parent = &(tmp1[i+1]);
+        else
+            tmp1[i].parent = &(tmp[4]);
     }
 
     target2D target;
@@ -48,6 +59,7 @@ int main(int argc, char** argv)
 			target.x += timeStep * vel;
         
         b2d_render(&tmp[0]);
+        b2d_render(&tmp1[0]);
         t2d_render(&target);
 
         ik_status_code code = ik_ccd_single_iteration(&tmp[0], target);

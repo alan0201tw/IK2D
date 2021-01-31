@@ -222,13 +222,21 @@ void renderer2D_clean_up()
 // } __internal_hack_mat4x4;
 
 static mat4x4 accumulatingMatrix;
-static bone2D* end_bone;
 static void __internal_b2d_render(bone2D* b2d)
 {
 	// render parent bone first, which will multiply the accumulatingMatrix
 	// with the parent's transformation matrix;
 	if(b2d->parent != NULL)
 		__internal_b2d_render(b2d->parent);
+
+	// the length of each bone is b2d.length
+	mat4x4 localAccumulatingMatrix;
+	mat4x4_identity(localAccumulatingMatrix);
+	// root bone should not have length, or should have zero length
+	// in this case we just ignore it by leaving it out of 
+	// the matrix multiplication chain
+	mat4x4_rotate_Z(localAccumulatingMatrix, localAccumulatingMatrix, b2d->angle);
+	mat4x4_mul(accumulatingMatrix, accumulatingMatrix, localAccumulatingMatrix);
 
 	if(b2d->parent != NULL)
 	{
@@ -243,22 +251,16 @@ static void __internal_b2d_render(bone2D* b2d)
 		glBindVertexArray(vertex_array);
 	}
 
-	// the length of each bone is b2d.length
-	mat4x4 localAccumulatingMatrix;
-	mat4x4_identity(localAccumulatingMatrix);
-	// root bone should not have length, or should have zero length
-	// in this case we just ignore it by leaving it out of 
-	// the matrix multiplication chain
+	mat4x4 tMat;
+	mat4x4_identity(tMat);
 	if(b2d->parent != NULL)
-		mat4x4_translate(localAccumulatingMatrix, b2d->length, 0.0f, 0.0f);
-	mat4x4_rotate_Z(localAccumulatingMatrix, localAccumulatingMatrix, b2d->angle);
-	mat4x4_mul(accumulatingMatrix, accumulatingMatrix, localAccumulatingMatrix);
+		mat4x4_translate(tMat, b2d->length, 0.0f, 0.0f);
+	mat4x4_mul(accumulatingMatrix, accumulatingMatrix, tMat);
 }
 
 void b2d_render(bone2D* b2d)
 {
 	mat4x4_identity(accumulatingMatrix);
-	end_bone = b2d;
 
 	__internal_b2d_render(b2d);
 }
