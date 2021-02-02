@@ -22,7 +22,10 @@ void renderer2D_end_frame();
 void renderer2D_clean_up();
 
 //
-void b2d_render(bone2D* b2d);
+void b2d_render(bone2D* b2d, int color_code);
 void t2d_render(target2D* t2d);
 
 void render2D_render_point(float x, float y);
+
+//
+void t2d_update_position(target2D* t2d, float timeStep);

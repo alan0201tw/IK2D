@@ -17,14 +17,22 @@ int main(int argc, char** argv)
     for(int i = 0; i < 5; i++)
     {
         tmp[i].angle = 0.0f;
-        // tmp[i].angle = (6.28f / 15.0f);
-        // tmp[i].length = 0.2f;
         tmp[i].length = 0.05f * (5-i);
-        // tmp[i].length = 0.02f * (i+1);
         if(i < 4)
             tmp[i].parent = &(tmp[i+1]);
         else
             tmp[i].parent = NULL;
+    }
+
+    bone2D tmp_pseudo_jaco[5];
+    for (int i = 0; i < 5; i++)
+    {
+        tmp_pseudo_jaco[i].angle = 0.0f;
+        tmp_pseudo_jaco[i].length = 0.05f * (5 - i);
+        if (i < 4)
+            tmp_pseudo_jaco[i].parent = &(tmp_pseudo_jaco[i + 1]);
+        else
+            tmp_pseudo_jaco[i].parent = NULL;
     }
 
     bone2D tmp1[5];
@@ -43,26 +51,21 @@ int main(int argc, char** argv)
     target.y = -0.5f;
 
     int iteration = 0;
-    const float vel = 0.5f;
 
 	while (!renderer2D_should_close())
 	{
 		float timeStep = (float)renderer2D_start_frame();
 
-        if(glfwGetKey(renderer2D_window(), GLFW_KEY_W) == GLFW_PRESS)
-			target.y += timeStep * vel;
-		else if(glfwGetKey(renderer2D_window(), GLFW_KEY_S) == GLFW_PRESS)
-			target.y -= timeStep * vel;
-		if(glfwGetKey(renderer2D_window(), GLFW_KEY_A) == GLFW_PRESS)
-			target.x -= timeStep * vel;
-		else if(glfwGetKey(renderer2D_window(), GLFW_KEY_D) == GLFW_PRESS)
-			target.x += timeStep * vel;
+        t2d_update_position(&target, timeStep);
+
+        ik_status_code code0 = ik_ccd_single_iteration(&tmp[0], target);
+        ik_status_code code1 = ik_inverse_jacobian_single_iteration(&tmp_pseudo_jaco[0], target);
         
-        b2d_render(&tmp[0]);
-        b2d_render(&tmp1[0]);
+        b2d_render(&tmp[0], 0); // red-ish
+        b2d_render(&tmp1[0], 1); // green-ish
+        b2d_render(&tmp_pseudo_jaco[0], 2); // blue-ish
         t2d_render(&target);
 
-        ik_status_code code = ik_ccd_single_iteration(&tmp[0], target);
         ++iteration;
 
 		renderer2D_end_frame();

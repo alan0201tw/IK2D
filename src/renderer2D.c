@@ -258,9 +258,32 @@ static void __internal_b2d_render(bone2D* b2d)
 	mat4x4_mul(accumulatingMatrix, accumulatingMatrix, tMat);
 }
 
-void b2d_render(bone2D* b2d)
+void b2d_render(bone2D* b2d, int color_code)
 {
 	mat4x4_identity(accumulatingMatrix);
+
+	if (color_code == 0)
+	{
+		b2d_color[0] = 0.8f;
+		b2d_color[1] = 0.3f;
+		b2d_color[2] = 0.2f;
+	}
+	else if (color_code == 1)
+	{
+		b2d_color[0] = 0.3f;
+		b2d_color[1] = 0.8f;
+		b2d_color[2] = 0.2f;
+	}
+	else if (color_code == 2)
+	{
+		b2d_color[0] = 0.3f;
+		b2d_color[1] = 0.2f;
+		b2d_color[2] = 0.8f;
+	}
+	else
+	{
+		fprintf(stderr, "ERROR : color_code not supported");
+	}
 
 	__internal_b2d_render(b2d);
 }
@@ -295,4 +318,18 @@ void render2D_render_point(float x, float y)
 
 	glBindVertexArray(vertex_array);
     glDrawArrays(GL_QUADS, 0, 4);
+}
+
+void t2d_update_position(target2D* t2d, float timeStep)
+{
+	const float vel = 0.5f;
+
+	if (glfwGetKey(renderer2D_window(), GLFW_KEY_W) == GLFW_PRESS)
+		t2d->y += timeStep * vel;
+	else if (glfwGetKey(renderer2D_window(), GLFW_KEY_S) == GLFW_PRESS)
+		t2d->y -= timeStep * vel;
+	if (glfwGetKey(renderer2D_window(), GLFW_KEY_A) == GLFW_PRESS)
+		t2d->x -= timeStep * vel;
+	else if (glfwGetKey(renderer2D_window(), GLFW_KEY_D) == GLFW_PRESS)
+		t2d->x += timeStep * vel;
 }
