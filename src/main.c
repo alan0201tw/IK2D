@@ -24,15 +24,15 @@ int main(int argc, char** argv)
             tmp[i].parent = NULL;
     }
 
-    bone2D tmp_pseudo_jaco[5];
+    bone2D tmp_jaco[5];
     for (int i = 0; i < 5; i++)
     {
-        tmp_pseudo_jaco[i].angle = 0.0f;
-        tmp_pseudo_jaco[i].length = 0.05f * (5 - i);
+        tmp_jaco[i].angle = 0.0f;
+        tmp_jaco[i].length = 0.05f * (5 - i);
         if (i < 4)
-            tmp_pseudo_jaco[i].parent = &(tmp_pseudo_jaco[i + 1]);
+            tmp_jaco[i].parent = &(tmp_jaco[i + 1]);
         else
-            tmp_pseudo_jaco[i].parent = NULL;
+            tmp_jaco[i].parent = NULL;
     }
 
     bone2D tmp1[5];
@@ -59,11 +59,11 @@ int main(int argc, char** argv)
         t2d_update_position(&target, timeStep);
 
         ik_status_code code0 = ik_ccd_single_iteration(&tmp[0], target);
-        ik_status_code code1 = ik_inverse_jacobian_single_iteration(&tmp_pseudo_jaco[0], target);
+        ik_status_code code1 = ik_inverse_jacobian_single_iteration(&tmp_jaco[0], target);
         
         b2d_render(&tmp[0], 0); // red-ish
-        b2d_render(&tmp1[0], 1); // green-ish
-        b2d_render(&tmp_pseudo_jaco[0], 2); // blue-ish
+        // b2d_render(&tmp1[0], 1); // green-ish
+        b2d_render(&tmp_jaco[0], 2); // blue-ish
         t2d_render(&target);
 
         ++iteration;
