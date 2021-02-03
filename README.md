@@ -1,6 +1,7 @@
 # 2D Inverse Kinematics
 
-![ik2D.gif](./ik2D.gif =256x256)
+<a href="url"><img src="./ik2D.gif" height="256" width="256" >
+</a>
 
 ## Control
 
