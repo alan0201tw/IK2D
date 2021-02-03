@@ -15,3 +15,6 @@ ik_status_code ik_inverse_jacobian_single_iteration(bone2D* b2d, target2D t2d);
 
 ik_status_code ik_ccd(bone2D* b2d, target2D t2d);
 ik_status_code ik_ccd_single_iteration(bone2D* b2d, target2D t2d);
+
+ik_status_code ik_fabrik(bone2D* b2d, target2D t2d);
+ik_status_code ik_fabrik_single_iteration(bone2D* b2d, target2D t2d);
