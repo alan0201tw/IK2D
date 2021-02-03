@@ -340,7 +340,8 @@ ik_status_code ik_fabrik_single_iteration(bone2D* b2d, target2D t2d)
         // the return value of atan2f range from -pi to pi
         float target_angle = atan2f(offset[1], offset[0]);
         b2d_list[boneIdx]->angle = target_angle - accumulating_angle;
-        accumulating_angle = target_angle;
+        //accumulating_angle = target_angle;
+        accumulating_angle += b2d_list[boneIdx]->angle;
     }
 
     return IK_ONGOING;
