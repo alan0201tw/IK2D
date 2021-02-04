@@ -12,6 +12,7 @@
 * CCD (Cyclic Coordinate Descent) IK
 * Jacobian IK
     * using the transpose of Jacobian matrix instead of pseudo inverse
+* FABRIK
 
 ## Reference
 
