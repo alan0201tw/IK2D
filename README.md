@@ -9,10 +9,10 @@
 
 ## Current Implementations
 
-* CCD (Cyclic Coordinate Descent) IK
-* Jacobian IK
+* CCD (Cyclic Coordinate Descent) IK - mark as red
+* Jacobian IK - mark as blue
     * using the transpose of Jacobian matrix instead of pseudo inverse
-* FABRIK
+* FABRIK - mark as green
 
 ## Reference
 
