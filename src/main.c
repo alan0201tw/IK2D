@@ -13,48 +13,52 @@ int main(int argc, char** argv)
 {
     renderer2D_init();
 
-    bone2D tmp[5];
-    for (int i = 0; i < 5; i++)
+    const int bone_count = 10;
+    const float bone_length = 0.1;
+
+    bone2D tmp[bone_count];
+    for (int i = 0; i < bone_count; i++)
     {
         tmp[i].angle = 0.0f;
-        tmp[i].length = 0.05f * (5 - i);
-        if (i < 4)
+        tmp[i].length = bone_length;
+        if (i < bone_count-1)
             tmp[i].parent = &(tmp[i + 1]);
         else
             tmp[i].parent = NULL;
     }
 
-    bone2D tmp_jaco[5];
-    for (int i = 0; i < 5; i++)
+    bone2D tmp_jaco[bone_count];
+    for (int i = 0; i < bone_count; i++)
     {
         tmp_jaco[i].angle = 0.0f;
-        tmp_jaco[i].length = 0.05f * (5 - i);
-        if (i < 4)
+        tmp_jaco[i].length = bone_length;
+        if (i < bone_count-1)
             tmp_jaco[i].parent = &(tmp_jaco[i + 1]);
         else
-            tmp_jaco[i].parent = &(tmp[4]);
+            tmp_jaco[i].parent = &(tmp[bone_count - 1]);
     }
 
-    bone2D tmp_fabrik[5];
-    for (int i = 0; i < 5; i++)
+    bone2D tmp_fabrik[bone_count];
+    for (int i = 0; i < bone_count; i++)
     {
         tmp_fabrik[i].angle = 0.0f;
-        tmp_fabrik[i].length = 0.05f * (5 - i);
-        if (i < 4)
+        tmp_fabrik[i].length = bone_length;
+        if (i < bone_count-1)
             tmp_fabrik[i].parent = &(tmp_fabrik[i + 1]);
         else
-            tmp_fabrik[i].parent = &(tmp[4]);
+            tmp_fabrik[i].parent = &(tmp[bone_count - 1]);
     }
 
     target2D target;
-    target.x = 0.2f;
-    target.y = -0.5f;
+    target.x = -0.3f;
+    target.y = 0.3f;
 
     int iteration = 0;
 
     while (!renderer2D_should_close())
     {
         float timeStep = (float)renderer2D_start_frame();
+        // fprintf(stderr, "fps = %f \n", 1.0f / timeStep);
 
         t2d_update_position(&target, timeStep);
         t2d_render(&target);
@@ -70,6 +74,8 @@ int main(int argc, char** argv)
         ++iteration;
 
         //tmp[4].angle += timeStep * 2.0f;
+        // target.x = cosf((float)iteration / 75.0f) * (0.1f + (float)iteration / 5000.0f);
+        // target.y = sinf((float)iteration / 75.0f) * (0.1f + (float)iteration / 5000.0f);
 
         renderer2D_end_frame();
     }
