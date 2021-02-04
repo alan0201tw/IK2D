@@ -11,7 +11,7 @@
 
 * CCD (Cyclic Coordinate Descent) IK - mark as red
 * Jacobian IK - mark as blue
-    * using the transpose of Jacobian matrix instead of pseudo inverse
+    * Support transpose of Jacobian matrix and pseudo-inverse
 * FABRIK - mark as green
 
 ## Reference
