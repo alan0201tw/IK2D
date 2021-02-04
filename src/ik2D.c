@@ -152,21 +152,25 @@ ik_status_code ik_inverse_jacobian_single_iteration(bone2D* b2d, target2D t2d)
     //     vec2_dup(inverse_jacobian_matrix[boneIdx], jacobian_matrix[boneIdx]);
     // }
     float inverse_AtA = 0.0f;
-    for (int boneIdx = 0; boneIdx < bone_count; ++boneIdx)
+    for (int boneIdx = 0; boneIdx < bone_count - 1; ++boneIdx)
         inverse_AtA += vec2_mul_inner(jacobian_matrix[boneIdx], jacobian_matrix[boneIdx]);
-    inverse_AtA = 1.0f / inverse_AtA;
-    for (int boneIdx = 0; boneIdx < bone_count; ++boneIdx)
+    inverse_AtA = 
+        (inverse_AtA == 0.0f || isnan(inverse_AtA)) ? 0.0f : 1.0f / inverse_AtA;
+
+    // fprintf(stderr, "inverse_AtA = %f \n", inverse_AtA);
+
+    for (int boneIdx = 0; boneIdx < bone_count - 1; ++boneIdx)
     {
         vec2 inverse_jacobian_entry;
         vec2_scale(inverse_jacobian_entry, jacobian_matrix[boneIdx], inverse_AtA);
         vec2_dup(inverse_jacobian_matrix[boneIdx], inverse_jacobian_entry);
     }
 
-    float delta_theta[128]; // dim = [bone_count, 1]
+    float delta_theta[128] = { 0.0f }; // dim = [bone_count, 1]
     for (int boneIdx = 1; boneIdx < bone_count; ++boneIdx)
     {
         //delta_theta[boneIdx - 1] = vec2_mul_inner(V, jacobian_matrix[boneIdx - 1]);
-        delta_theta[boneIdx - 1] = vec2_mul_inner(V, inverse_jacobian_matrix[boneIdx - 1]);
+        delta_theta[boneIdx - 1] = 0.1f * vec2_mul_inner(V, inverse_jacobian_matrix[boneIdx - 1]);
         b2d_list[boneIdx]->angle += delta_theta[boneIdx - 1];
     }
 

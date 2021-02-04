@@ -21,7 +21,7 @@ int main(int argc, char** argv)
     {
         tmp[i].angle = 0.0f;
         tmp[i].length = bone_length;
-        if (i < bone_count-1)
+        if (i < bone_count - 1)
             tmp[i].parent = &(tmp[i + 1]);
         else
             tmp[i].parent = NULL;
@@ -32,7 +32,7 @@ int main(int argc, char** argv)
     {
         tmp_jaco[i].angle = 0.0f;
         tmp_jaco[i].length = bone_length;
-        if (i < bone_count-1)
+        if (i < bone_count - 1)
             tmp_jaco[i].parent = &(tmp_jaco[i + 1]);
         else
             tmp_jaco[i].parent = &(tmp[bone_count - 1]);
@@ -43,7 +43,7 @@ int main(int argc, char** argv)
     {
         tmp_fabrik[i].angle = 0.0f;
         tmp_fabrik[i].length = bone_length;
-        if (i < bone_count-1)
+        if (i < bone_count - 1)
             tmp_fabrik[i].parent = &(tmp_fabrik[i + 1]);
         else
             tmp_fabrik[i].parent = &(tmp[bone_count - 1]);
@@ -72,6 +72,9 @@ int main(int argc, char** argv)
         b2d_render(&tmp_jaco[0], 2); // blue-ish
 
         ++iteration;
+
+        // for (int i = 0; i < bone_count; i++)
+        //     fprintf(stderr, "inv_jaco : i = %d, angle = %f \n", i, tmp_jaco[i].angle);
 
         //tmp[4].angle += timeStep * 2.0f;
         // target.x = cosf((float)iteration / 75.0f) * (0.1f + (float)iteration / 5000.0f);
