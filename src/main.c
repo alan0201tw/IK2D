@@ -53,33 +53,38 @@ int main(int argc, char** argv)
     target.x = -0.3f;
     target.y = 0.3f;
 
-    int iteration = 0;
+    float timer = 0;
 
     while (!renderer2D_should_close())
     {
         float timeStep = (float)renderer2D_start_frame();
         // fprintf(stderr, "fps = %f \n", 1.0f / timeStep);
+        // target.x = cosf(timer * 2.0f + 0.001f) * (0.1f + timer / 50.0f);
+        // target.y = sinf(timer * 2.0f + 0.001f) * (0.1f + timer / 50.0f);
 
         t2d_update_position(&target, timeStep);
         t2d_render(&target);
 
-        ik_status_code code0 = ik_ccd_single_iteration(&tmp[0], target);
-        ik_status_code code1 = ik_inverse_jacobian_single_iteration(&tmp_jaco[0], target);
-        ik_status_code code2 = ik_fabrik_single_iteration(&tmp_fabrik[0], target);
+        // ik_status_code code0 = ik_ccd_single_iteration(&tmp[0], target);
+        // ik_status_code code1 = ik_inverse_jacobian_single_iteration(&tmp_jaco[0], target);
+        // ik_status_code code2 = ik_fabrik_single_iteration(&tmp_fabrik[0], target);
+
+        ik_status_code code0 = ik_ccd(&tmp[0], target);
+        ik_status_code code1 = ik_inverse_jacobian(&tmp_jaco[0], target);
+        ik_status_code code2 = ik_fabrik(&tmp_fabrik[0], target);
 
         b2d_render(&tmp[0], 0); // red-ish
         b2d_render(&tmp_fabrik[0], 1); // green-ish
         b2d_render(&tmp_jaco[0], 2); // blue-ish
 
-        ++iteration;
+        timer += timeStep;
+        // fprintf(stderr, "timer = %f \n", timer);
 
         // for (int i = 0; i < bone_count; i++)
         //     fprintf(stderr, "inv_jaco : i = %d, angle = %f \n", i, tmp_jaco[i].angle);
 
         //tmp[4].angle += timeStep * 2.0f;
-        // target.x = cosf((float)iteration / 75.0f) * (0.1f + (float)iteration / 5000.0f);
-        // target.y = sinf((float)iteration / 75.0f) * (0.1f + (float)iteration / 5000.0f);
-
+        
         renderer2D_end_frame();
     }
 

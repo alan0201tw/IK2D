@@ -91,7 +91,8 @@ ik_status_code ik_inverse_jacobian(bone2D* b2d, target2D t2d)
 {
     ik_status_code code = IK_ONGOING;
 
-    while (code == IK_ONGOING)
+    int max_iteration = 1000;
+    while (code == IK_ONGOING && (max_iteration--) > 0)
     {
         code = ik_inverse_jacobian_single_iteration(b2d, t2d);
     }
@@ -181,7 +182,8 @@ ik_status_code ik_ccd(bone2D* b2d, target2D t2d)
 {
     ik_status_code code = IK_ONGOING;
 
-    while (code == IK_ONGOING)
+    int max_iteration = 1000;
+    while (code == IK_ONGOING && (max_iteration--) > 0)
     {
         code = ik_ccd_single_iteration(b2d, t2d);
     }
@@ -281,7 +283,8 @@ ik_status_code ik_fabrik(bone2D* b2d, target2D t2d)
 {
     ik_status_code code = IK_ONGOING;
 
-    while (code == IK_ONGOING)
+    int max_iteration = 1000;
+    while (code == IK_ONGOING && (max_iteration--) > 0)
     {
         code = ik_fabrik_single_iteration(b2d, t2d);
     }
@@ -360,7 +363,9 @@ ik_status_code ik_fabrik_single_iteration(bone2D* b2d, target2D t2d)
         
         // the return value of atan2f range from -pi to pi
         float target_angle = atan2f(offset[1], offset[0]);
+        if(isnan(target_angle)) continue;
         b2d_list[boneIdx]->angle = target_angle - accumulating_angle;
+        // fprintf(stderr, "i = %d, angle = %f \n", boneIdx, b2d_list[boneIdx]->angle);
         //accumulating_angle = target_angle;
         accumulating_angle += b2d_list[boneIdx]->angle;
     }
