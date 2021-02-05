@@ -9,12 +9,13 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
+#define bone_count (10)
+
 int main(int argc, char** argv)
 {
     renderer2D_init();
 
-    const int bone_count = 10;
-    const float bone_length = 0.1;
+    const float bone_length = 0.1f;
 
     bone2D tmp[bone_count];
     for (int i = 0; i < bone_count; i++)
