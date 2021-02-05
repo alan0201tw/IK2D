@@ -157,15 +157,8 @@ ik_status_code ik_inverse_jacobian_single_iteration(bone2D* b2d, target2D t2d)
         inverse_AtA += vec2_mul_inner(jacobian_matrix[boneIdx], jacobian_matrix[boneIdx]);
     inverse_AtA = 
         (inverse_AtA == 0.0f || isnan(inverse_AtA)) ? 0.0f : 1.0f / inverse_AtA;
-
-    // fprintf(stderr, "inverse_AtA = %f \n", inverse_AtA);
-
     for (int boneIdx = 0; boneIdx < bone_count - 1; ++boneIdx)
-    {
-        vec2 inverse_jacobian_entry;
-        vec2_scale(inverse_jacobian_entry, jacobian_matrix[boneIdx], inverse_AtA);
-        vec2_dup(inverse_jacobian_matrix[boneIdx], inverse_jacobian_entry);
-    }
+        vec2_scale(inverse_jacobian_matrix[boneIdx], jacobian_matrix[boneIdx], inverse_AtA);
 
     float delta_theta[128] = { 0.0f }; // dim = [bone_count, 1]
     for (int boneIdx = 1; boneIdx < bone_count; ++boneIdx)

@@ -1,6 +1,8 @@
 # 2D Inverse Kinematics
 
-<a href="url"><img src="./ik2D.gif" height="256" width="256" >
+<a href="url"><img src="./ik2D_0.gif" height="256" width="256" >
+</a>
+<a href="url"><img src="./ik2D_1.gif" height="256" width="256" >
 </a>
 
 ## Control
