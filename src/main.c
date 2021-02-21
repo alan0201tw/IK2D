@@ -17,6 +17,11 @@ int main(int argc, char** argv)
 
     const float bone_length = 0.1f;
 
+    bone2D root;
+    root.angle = 0.0f;
+    root.length = 0.0f;
+    root.parent = NULL;
+
     bone2D tmp[bone_count];
     for (int i = 0; i < bone_count; i++)
     {
@@ -25,7 +30,7 @@ int main(int argc, char** argv)
         if (i < bone_count - 1)
             tmp[i].parent = &(tmp[i + 1]);
         else
-            tmp[i].parent = NULL;
+            tmp[i].parent = &root;
     }
 
     bone2D tmp_jaco[bone_count];
@@ -36,7 +41,7 @@ int main(int argc, char** argv)
         if (i < bone_count - 1)
             tmp_jaco[i].parent = &(tmp_jaco[i + 1]);
         else
-            tmp_jaco[i].parent = &(tmp[bone_count - 1]);
+            tmp_jaco[i].parent = &root;
     }
 
     bone2D tmp_fabrik[bone_count];
@@ -47,7 +52,7 @@ int main(int argc, char** argv)
         if (i < bone_count - 1)
             tmp_fabrik[i].parent = &(tmp_fabrik[i + 1]);
         else
-            tmp_fabrik[i].parent = &(tmp[bone_count - 1]);
+            tmp_fabrik[i].parent = &root;
     }
 
     target2D target;
@@ -59,9 +64,6 @@ int main(int argc, char** argv)
     while (!renderer2D_should_close())
     {
         float timeStep = (float)renderer2D_start_frame();
-        // fprintf(stderr, "fps = %f \n", 1.0f / timeStep);
-        // target.x = cosf(timer * 2.0f + 0.001f) * (0.1f + timer / 50.0f);
-        // target.y = sinf(timer * 2.0f + 0.001f) * (0.1f + timer / 50.0f);
 
         t2d_update_position(&target, timeStep);
         t2d_render(&target);
@@ -79,13 +81,7 @@ int main(int argc, char** argv)
         b2d_render(&tmp_jaco[0], 2); // blue-ish
 
         timer += timeStep;
-        // fprintf(stderr, "timer = %f \n", timer);
 
-        // for (int i = 0; i < bone_count; i++)
-        //     fprintf(stderr, "inv_jaco : i = %d, angle = %f \n", i, tmp_jaco[i].angle);
-
-        //tmp[4].angle += timeStep * 2.0f;
-        
         renderer2D_end_frame();
     }
 
